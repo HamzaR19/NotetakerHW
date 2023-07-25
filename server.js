@@ -1,71 +1,81 @@
 const express = require('express');
-const PORT = process.env.PORT || 3001;
 const fs = require('fs');
-const app = express();
-const notes = require('./db/db.json');
 const path = require('path');
-const uuid = require('./helpers/uuid');
+const { v4: uuidv4 } = require('uuid');
 
-app.use (express.json());
-// app.use ('/api/notes', require('./api'));
+const app = express();
+const PORT = process.env.PORT || 3000;
+const dbPath = path.join(__dirname, 'db', 'db.json');
 
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-app.get('/' , (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './public/index.html'));
 });
 
-app.get('/notes' , (req, res) => {
+app.get('/notes', (req, res) => {
     res.sendFile(path.join(__dirname, './public/notes.html'));
-}
-);
+});
 
 app.get('/api/notes', (req, res) => {
-    fs.readFile('./db/db.json', (err, data) => {
-        if (err) throw err;
-        res.json(JSON.parse(data));
+    fs.readFile(dbPath, 'utf8', (err, data) => {
+        if (err) {
+            res.status(500).send('Error reading the notes');
+        } else {
+            res.json(JSON.parse(data));
+        }
     });
-}
-);
+});
 
 app.post('/api/notes', (req, res) => {
-    req.body.id = uuid();
-    notes.push(req.body);
-    fs.writeFileSync('./db/db.json', JSON.stringify(notes));
-    res.json(notes);
-}   
-);
+    const newNote = {
+        id: uuidv4(),
+        title: req.body.title,
+        text: req.body.text
+    };
+
+    fs.readFile(dbPath, 'utf8', (err, data) => {
+        if (err) {
+            res.status(500).send('Error reading the notes');
+        } else {
+            const notes = JSON.parse(data);
+            notes.push(newNote);
+            fs.writeFile(dbPath, JSON.stringify(notes), (err) => {
+                if (err) {
+                    res.status(500).send('Error writing the note');
+                } else {
+                    res.json(newNote);
+                }
+            });
+        }
+    });
+});
 
 app.delete('/api/notes/:id', (req, res) => {
     const noteId = req.params.id;
-    notes.splice(noteId, 1);
-    fs.writeFileSync('./db/db.json', JSON.stringify(notes));
-    res.json(notes);
-},
-);
+    fs.readFile(dbPath, 'utf8', (err, data) => {
+        if (err) {
+            res.status(500).send('Error reading the notes');
+        } else {
+            const notes = JSON.parse(data);
+            const noteIndex = notes.findIndex(note => note.id === noteId);
 
+            if (noteIndex !== -1) {
+                notes.splice(noteIndex, 1);
+                fs.writeFile(dbPath, JSON.stringify(notes), (err) => {
+                    if (err) {
+                        res.status(500).send('Error writing the note');
+                    } else {
+                        res.json(notes);
+                    }
+                });
+            } else {
+                res.status(404).send('Note not found');
+            }
+        }
+    });
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-app.listen(PORT, () => console.log(`Listening on PORT: PORT`));
+app.listen(PORT, () => console.log(`Listening on PORT:${PORT}`));
