@@ -16,7 +16,7 @@ Hamza Rahman's README
 
  * [Test-Instructions](#test-instructions)
 
- * [Image](#Image)
+ * [Images](#Images)
 
  * [License](#license)
 
