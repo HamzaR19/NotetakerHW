@@ -16,7 +16,7 @@ Hamza Rahman's README
 
  * [Test-Instructions](#test-instructions)
 
- * [Link to Application](#link)
+ * [Link](#Link)
 
  * [Images](#Images)
 
