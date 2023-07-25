@@ -48,7 +48,7 @@ Dom Span
 
 Tested the code and everything seems to be functional
 
-## Link to Application
+## Link
 https://notetaker10000-49aa8f594796.herokuapp.com/notes
 
 ## Images
