@@ -46,7 +46,7 @@ Dom Span
 
 Tested the code and everything seems to be functional
 
-## Image
+## Images
 
 ![Screenshot_20230725_153827_Chrome](https://github.com/HamzaR19/NotetakerHW/assets/132932060/f52fb79e-de73-4732-b7e5-326e4a4f3208)
 
